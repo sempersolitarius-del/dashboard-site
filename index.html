@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API keys Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #181818;
+            color: #fff;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 180px;
+            height: 100vh;
+            background: #222;
+            padding-top: 24px;
+            border-right: 1px solid #333;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            margin: 12px 0;
+        }
+        .sidebar ul li a {
+            color: #ccc;
+            text-decoration: none;
+            padding: 8px 24px;
+            display: block;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .sidebar ul li a.active, .sidebar ul li a:hover {
+            background: #333;
+            color: #fff;
+        }
+        .main {
+            margin-left: 180px;
+            padding: 32px 40px;
+        }
+        .header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .desc {
+            color: #aaa;
+            margin-bottom: 18px;
+            font-size: 1em;
+        }
+        .table-container {
+            background: #222;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px #0002;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+        }
+        th {
+            background: #222;
+            color: #bbb;
+            font-weight: 500;
+            border-bottom: 1px solid #333;
+        }
+        td {
+            background: #181818;
+            border-bottom: 1px solid #222;
+        }
+        .btn {
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-right: 6px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #444;
+        }
+        .topbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .create-btn {
+            background: #444;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .create-btn:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <li><a href="#" >Chat</a></li>
+            <li><a href="#" >Audio</a></li>
+            <li><a href="#" >Images</a></li>
+            <li><a href="#" >Assistants</a></li>
+            <li><a href="#" >Usage</a></li>
+            <li><a href="#" class="active">API keys</a></li>
+            <li><a href="#" >Logs</a></li>
+            <li><a href="#" >Storage</a></li>
+            <li><a href="#" >Batches</a></li>
+            <li><a href="#" >Evaluations</a></li>
+            <li><a href="#" >Fine-tuning</a></li>
+        </ul>
+    </div>
+    <div class="main" id="main-content">
+        <!-- Контент будет меняться динамически -->
+    </div>
+    <script>
+    const pages = {
+        'Chat': `
+            <div class="header">Chat</div>
+            <div class="desc">Общайтесь с вашим AI-ассистентом в реальном времени.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div style="margin-bottom:16px;">Пример диалога:</div>
+                <div style="background:#181818;padding:12px;border-radius:6px;margin-bottom:8px;">Пользователь: Привет! Как дела?</div>
+                <div style="background:#222;padding:12px;border-radius:6px;">AI: Здравствуйте! Я готов помочь вам.</div>
+            </div>
+        `,
+        'Audio': `
+            <div class="header">Audio</div>
+            <div class="desc">Здесь вы можете работать с аудиофайлами: распознавать речь, преобразовывать текст в аудио и другое.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Пример: <b>Загрузите аудиофайл</b> для анализа.</div>
+                <input type="file" accept="audio/*" style="margin-top:12px;background:#181818;color:#fff;">
+            </div>
+        `,
+        'Images': `
+            <div class="header">Images</div>
+            <div class="desc">Работа с изображениями: генерация, анализ, загрузка.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Пример: <b>Загрузите изображение</b> для анализа.</div>
+                <input type="file" accept="image/*" style="margin-top:12px;background:#181818;color:#fff;">
+            </div>
+        `,
+        'Assistants': `
+            <div class="header">Assistants</div>
+            <div class="desc">Управление вашими AI-ассистентами и их настройками.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <ul style="color:#fff;">
+                    <li>Ассистент 1: Помощник по программированию</li>
+                    <li>Ассистент 2: Помощник по обучению</li>
+                </ul>
+            </div>
+        `,
+        'Usage': `
+            <div class="header">Usage</div>
+            <div class="desc">Статистика использования API и сервисов.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Сегодня: <b>124 запроса</b></div>
+                <div>Месяц: <b>3 210 запросов</b></div>
+            </div>
+        `,
+        'API keys': `
+            <div class="topbar">
+                <button class="create-btn">+ Create new secret key</button>
+            </div>
+            <div class="header">API keys</div>
+            <div class="desc">
+                You have permission to view and manage all API keys in this project.<br>
+                Do not share your API key with others or expose it in the browser or other client-side code. To protect your account's security, OpenAI may automatically disable any API key that has leaked publicly.<br>
+                View usage per API key on the <a href="#" style="color:#4faaff;">Usage page</a>.
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>SECRET KEY</th>
+                            <th>CREATED</th>
+                            <th>LAST USED</th>
+                            <th>CREATED BY</th>
+                            <th>PERMISSIONS</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>visual studio</td>
+                            <td>sk-...tytA</td>
+                            <td>7 авг. 2025 г.</td>
+                            <td>Never</td>
+                            <td>Nikita B</td>
+                            <td>All</td>
+                            <td>
+                                <button class="btn" title="Edit">✏️</button>
+                                <button class="btn" title="Delete">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>kurlik</td>
+                            <td>sk-...sftuA</td>
+                            <td>24 мар. 2025 г.</td>
+                            <td>26 июн. 2025 г.</td>
+                            <td>Nikita B</td>
+                            <td>All</td>
+                            <td>
+                                <button class="btn" title="Edit">✏️</button>
+                                <button class="btn" title="Delete">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `,
+        'Logs': `
+            <div class="header">Logs</div>
+            <div class="desc">Просмотр логов и истории действий.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <ul style="color:#fff;">
+                    <li>07.08.2025 12:01 — Ключ создан</li>
+                    <li>26.06.2025 09:44 — Ключ использован</li>
+                </ul>
+            </div>
+        `,
+        'Storage': `
+            <div class="header">Storage</div>
+            <div class="desc">Управление файлами и хранилищем данных.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Загружено файлов: <b>5</b></div>
+                <div>Свободно: <b>1.2 GB</b></div>
+            </div>
+        `,
+        'Batches': `
+            <div class="header">Batches</div>
+            <div class="desc">Пакетная обработка запросов и данных.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Последний пакет: <b>07.08.2025</b></div>
+                <div>Статус: <span style="color:#4faaff;">Выполнено</span></div>
+            </div>
+        `,
+        'Evaluations': `
+            <div class="header">Evaluations</div>
+            <div class="desc">Оценка качества моделей и сервисов.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Последняя оценка: <b>95%</b></div>
+                <div>Дата: <b>06.08.2025</b></div>
+            </div>
+        `,
+        'Fine-tuning': `
+            <div class="header">Fine-tuning</div>
+            <div class="desc">Тонкая настройка моделей под ваши задачи.</div>
+            <div style="background:#222;padding:24px;border-radius:8px;">
+                <div>Последняя настройка: <b>GPT-4</b></div>
+                <div>Статус: <span style="color:#4faaff;">Успешно</span></div>
+            </div>
+        `
+    };
+
+    function setPage(page) {
+        document.querySelectorAll('.sidebar ul li a').forEach(a => a.classList.remove('active'));
+        const links = Array.from(document.querySelectorAll('.sidebar ul li a'));
+        const found = links.find(a => a.textContent.trim() === page);
+        if (found) found.classList.add('active');
+        document.getElementById('main-content').innerHTML = pages[page] || '<div class="header">Страница не найдена</div>';
+    }
+
+    document.querySelectorAll('.sidebar ul li a').forEach(a => {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            setPage(this.textContent.trim());
+        });
+    });
+
+    // По умолчанию показываем API keys
+    setPage('API keys');
+    </script>
+</body>
+</html>
